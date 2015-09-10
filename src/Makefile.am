@@ -33,7 +33,7 @@ tcprstat_LDFLAGS = $(AM_LDFLAGS) -L$(top_srcdir)/@LIBPCAP_SUBDIR@ -lpthread
 tcprstat_LDADD = -lpcap
 
 tcprstat_static_CFLAGS = $(AM_CFLAGS) -pthread -I$(top_srcdir)/@LIBPCAP_SUBDIR@
-tcprstat_static_LDFLAGS = $(AM_LDFLAGS) -static -L$(top_srcdir)/@LIBPCAP_SUBDIR@
+tcprstat_static_LDFLAGS = $(AM_LDFLAGS) -L$(top_srcdir)/@LIBPCAP_SUBDIR@
 tcprstat_static_LDADD = -lpthread -lpcap
 
 else
