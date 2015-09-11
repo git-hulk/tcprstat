@@ -54,22 +54,21 @@ output_thread(void *arg) {
     if (!check_format(options->format))
         abort();
     
-    if (options->show_header) {
-        if (options->header)
-            output_header(options->header, 1);
-        else
-            output_header(options->format, 0);
-        
-    }
-    
     for (iterations = 0; !options->iterations || iterations < options->iterations;
             iterations ++)
     {
         nanosleep(&ts, NULL);
-        
+
         time(&current);
+        if (options->show_header) {
+            if (options->header)
+                output_header(options->header, 1);
+            else
+                output_header(options->format, 0);
+
+        }
         output(current, options->format, iterations);
-        
+
     }
     
     // Iterations finished, signal capturing process

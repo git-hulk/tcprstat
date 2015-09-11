@@ -32,7 +32,7 @@ int free_stats(void);
 
 int inbound(struct timeval tv, struct in_addr laddr, struct in_addr raddr,
                 uint16_t lport, uint16_t rport);
-int outbound(struct timeval tv, struct in_addr laddr, struct in_addr raddr,
+long long outbound(struct timeval tv, struct in_addr laddr, struct in_addr raddr,
                 uint16_t lport, uint16_t rport);
                 
 struct stats_results *get_flush_stats(void);

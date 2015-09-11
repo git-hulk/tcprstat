@@ -68,6 +68,8 @@ char *usage_msg =
     "\t                     Output interval. Default is %d.\n"
     "\t--iterations <n>, -n\n"
     "\t                     Output iterations. Default is %d, 0 is infinity\n"
+    "\t--threshold <ms>, -T\n"
+    "\t                     Dump packet info when duration is bigger than threshold. Default is %dms, 0 is nolimit\n"
     "\n"
     "\t--help               Shows program information and usage.\n"
     "\t--version            Shows version information.\n"
@@ -77,7 +79,7 @@ char *usage_msg =
 int
 dump_usage(FILE *stream) {
     fprintf(stream, usage_msg, program_name, program_name, 
-    DEFAULT_OUTPUT_FORMAT, DEFAULT_OUTPUT_INTERVAL, DEFAULT_OUTPUT_ITERATIONS);
+    DEFAULT_OUTPUT_FORMAT, DEFAULT_OUTPUT_INTERVAL, DEFAULT_OUTPUT_ITERATIONS, 0);
 
     return 0;
 

@@ -48,11 +48,12 @@ struct option long_options[] = {
     { "interval", required_argument, NULL, 't' },
     { "iterations", required_argument, NULL, 'n' },
     { "read", required_argument, NULL, 'r' },
+    { "threshold", required_argument, NULL, 'T' },
 
     { NULL, 0, NULL, '\0' }
 
 };
-char *short_options = "hVp:f:t:n:r:l:";
+char *short_options = "hVp:f:t:n:r:l:T:";
 
 int specified_addresses = 0;
 
@@ -63,10 +64,11 @@ char *program_name;
 int port;
 int interval = 30;
 FILE *capture_file = NULL;
-struct output_options output_options = {
+struct output_options global_options = {
     DEFAULT_OUTPUT_FORMAT,
     DEFAULT_OUTPUT_INTERVAL,
     DEFAULT_OUTPUT_ITERATIONS,
+    0,
     
     DEFAULT_SHOW_HEADER,
     NULL,
@@ -133,12 +135,12 @@ main(int argc, char *argv[]) {
                 return EXIT_FAILURE;
             }
             
-            output_options.format = optarg;
+            global_options.format = optarg;
             
             break;
             
         case 't':
-            output_options.interval = strtoul(optarg, NULL, 10);
+            global_options.interval = strtoul(optarg, NULL, 10);
             if (interval <= 0 || interval >= MAX_OUTPUT_INTERVAL) {
                 fprintf(stderr, "Bad interval provided\n");
                 return EXIT_FAILURE;
@@ -147,7 +149,7 @@ main(int argc, char *argv[]) {
             break;
             
         case 'n':
-            output_options.iterations = strtol(optarg, NULL, 10);
+            global_options.iterations = strtol(optarg, NULL, 10);
             if (interval < 0) {
                 fprintf(stderr, "Bad iterations provided\n");
                 return EXIT_FAILURE;
@@ -155,13 +157,22 @@ main(int argc, char *argv[]) {
             
             break;
             
+        case 'T':
+            global_options.threshold = strtol(optarg, NULL, 10) * 1000;
+            if (global_options.threshold < 0) {
+                fprintf(stderr, "Bad threshold provided\n");
+                return EXIT_FAILURE;
+            }
+            
+            break;
+
         case 's':
-            output_options.header = optarg;
-            output_options.show_header = 1;
+            global_options.header = optarg;
+            global_options.show_header = 1;
             break;
             
         case 'S':
-            output_options.show_header = 0;
+            global_options.show_header = 0;
             break;
             
         case 'h':
@@ -203,7 +214,7 @@ main(int argc, char *argv[]) {
     init_stats();
     
     if (capture_file) {
-        output_offline_start(&output_options);
+        output_offline_start(&global_options);
 
         offline_capture(capture_file);
         
@@ -215,7 +226,7 @@ main(int argc, char *argv[]) {
         pthread_create(&capture_thread_id, NULL, capture, NULL);
         
         // Options thread
-        pthread_create(&output_thread_id, NULL, output_thread, &output_options);
+        pthread_create(&output_thread_id, NULL, output_thread, &global_options);
         
         pthread_join(capture_thread_id, NULL);
         pthread_kill(output_thread_id, SIGINT);

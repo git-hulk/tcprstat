@@ -112,7 +112,7 @@ inbound(struct timeval tv, struct in_addr laddr, struct in_addr raddr,
     
 }
 
-int
+long long
 outbound(struct timeval tv, struct in_addr laddr, struct in_addr raddr,
          uint16_t lport, uint16_t rport)
 {
@@ -142,13 +142,13 @@ outbound(struct timeval tv, struct in_addr laddr, struct in_addr raddr,
         
         unlock_stats();
         
-        return 0;
+        return newstat;
         
     }
             
     unlock_sessions();
     
-    return 1;    
+    return -1;    
     
 }
 

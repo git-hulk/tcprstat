@@ -39,6 +39,7 @@ extern char *program_name;
 extern time_t timestamp;
 
 extern FILE *capture_file;
+extern struct output_options global_options;
 
 void terminate(int signal);
 

@@ -28,6 +28,7 @@ struct output_options {
     char *format;
     int interval;       // Seconds
     unsigned long iterations;
+    int threshold;      // millisecond 
     
     int show_header;
     char *header;

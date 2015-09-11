@@ -144,7 +144,14 @@ process_ip(pcap_t *dev, const struct ip *ip, struct timeval tv) {
             lport = sport;
             rport = dport;
             
-            outbound(tv, ip->ip_src, ip->ip_dst, lport, rport);
+            long long duration = 0;
+            duration = outbound(tv, ip->ip_src, ip->ip_dst, lport, rport);
+            if(global_options.threshold && duration >= global_options.threshold ) {
+                fprintf(stderr, "Packet %s:%d <==> %s:%d cost %.3fms\n", 
+                dst, dport,
+                src, sport,
+                duration/1000.0);
+            }
             
         }
 
