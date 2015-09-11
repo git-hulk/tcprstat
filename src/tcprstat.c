@@ -41,6 +41,7 @@ struct option long_options[] = {
     { "version", no_argument, NULL, 'V' },
     
     { "local", required_argument, NULL, 'l' },
+    { "destination", required_argument, NULL, 'd' },
     { "port", required_argument, NULL, 'p' },
     { "format", required_argument, NULL, 'f' },
     { "header", optional_argument, NULL, 's' },
@@ -48,12 +49,13 @@ struct option long_options[] = {
     { "interval", required_argument, NULL, 't' },
     { "iterations", required_argument, NULL, 'n' },
     { "read", required_argument, NULL, 'r' },
+    { "client", required_argument, NULL, 'c' },
     { "threshold", required_argument, NULL, 'T' },
 
     { NULL, 0, NULL, '\0' }
 
 };
-char *short_options = "hVp:f:t:n:r:l:T:";
+char *short_options = "hcVp:f:t:n:r:l:T:d:";
 
 int specified_addresses = 0;
 
@@ -69,10 +71,10 @@ struct output_options global_options = {
     DEFAULT_OUTPUT_INTERVAL,
     DEFAULT_OUTPUT_ITERATIONS,
     0,
-    
+    0,    
     DEFAULT_SHOW_HEADER,
     NULL,
-    
+    NULL 
 };
 
 // Operation timestamp
@@ -164,6 +166,15 @@ main(int argc, char *argv[]) {
                 return EXIT_FAILURE;
             }
             
+            break;
+
+        case 'd':
+            global_options.server = strdup(optarg);
+            
+            break;
+
+        case 'c':
+            global_options.is_client = 1;
             break;
 
         case 's':

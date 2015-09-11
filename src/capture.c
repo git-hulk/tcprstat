@@ -21,11 +21,13 @@
 
 #include "tcprstat.h"
 #include "capture.h"
+#include "output.h"
 #include "process-packet.h"
 
 #include <pcap.h>
 
 pcap_t *pcap;
+struct output_options global_options;
 
 void *
 capture(void *arg) {
@@ -43,11 +45,16 @@ capture(void *arg) {
     }
     
     // Capture only TCP
-    if (port)
+    if (global_options.server && port) {
+        sprintf(filter, "host %s and tcp port %d", global_options.server, port);
+    } else if (global_options.server && !port) {
+        sprintf(filter, "host %s", global_options.server);
+    } else if (!global_options.server && port) {
         sprintf(filter, "tcp port %d", port);
-    else
+    } else {
         sprintf(filter, "tcp");
-    
+    }
+
     if (pcap_compile(pcap, &bpf, filter, 1, 0)) {
         fprintf(stderr, "pcap: %s\n", pcap_geterr(pcap));
         return NULL;
@@ -76,7 +83,7 @@ int
 offline_capture(FILE *fcapture) {
     struct bpf_program bpf;
     char errbuf[PCAP_ERRBUF_SIZE];
-    char filter[30];
+    char filter[256];
     int r;
 
     pcap = pcap_fopen_offline(fcapture, errbuf);
@@ -87,11 +94,16 @@ offline_capture(FILE *fcapture) {
     }
     
     // Capture only TCP
-    if (port)
+    if (global_options.server && port) {
+        sprintf(filter, "host %s and tcp port %d", global_options.server, port);
+    } else if (global_options.server && !port) {
+        sprintf(filter, "host %s", global_options.server);
+    } else if (!global_options.server && port) {
         sprintf(filter, "tcp port %d", port);
-    else
+    } else {
         sprintf(filter, "tcp");
-    
+    }
+
     if (pcap_compile(pcap, &bpf, filter, 1, 0)) {
         fprintf(stderr, "pcap: %s\n", pcap_geterr(pcap));
         return 1;

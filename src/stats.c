@@ -152,6 +152,22 @@ outbound(struct timeval tv, struct in_addr laddr, struct in_addr raddr,
     
 }
 
+long long
+client_inbound(struct timeval tv, struct in_addr laddr, struct in_addr raddr,
+        uint16_t lport, uint16_t rport)
+{
+    // client side is opposite to server side
+    return outbound(tv, laddr, raddr, lport, rport);
+}
+
+int
+client_outbound(struct timeval tv, struct in_addr laddr, struct in_addr raddr,
+         uint16_t lport, uint16_t rport)
+{
+    // client side is opposite to server side
+    return inbound(tv, laddr, raddr, lport, rport);
+}
+
 static int
 lock_stats(void) {
     return pthread_mutex_lock(&stats_mutex);

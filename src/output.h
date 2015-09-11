@@ -29,10 +29,11 @@ struct output_options {
     int interval;       // Seconds
     unsigned long iterations;
     int threshold;      // millisecond 
+    int is_client; 
     
     int show_header;
     char *header;
-    
+    char *server;
 };
 
 // Parameter of output_thread is of type output_thread_options

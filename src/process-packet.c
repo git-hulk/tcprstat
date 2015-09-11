@@ -85,7 +85,6 @@ process_packet(unsigned char *user, const struct pcap_pkthdr *header,
         output_offline_update(header->ts);
     
     process_ip(pcap, ip, header->ts);
-    
 }
 
 int
@@ -133,26 +132,35 @@ process_ip(pcap_t *dev, const struct ip *ip, struct timeval tv) {
         if (datalen == 0)
             break;
 
+        long long duration = 0;
         if (incoming) {
             lport = dport;
             rport = sport;
             
-            inbound(tv, ip->ip_dst, ip->ip_src, lport, rport);
-            
+            if(global_options.is_client) {
+                duration = client_inbound(tv, ip->ip_dst, ip->ip_src, lport, rport);
+            } else {
+                // server side incoming
+                inbound(tv, ip->ip_dst, ip->ip_src, lport, rport);
+            }
         }
         else {
             lport = sport;
             rport = dport;
             
-            long long duration = 0;
-            duration = outbound(tv, ip->ip_src, ip->ip_dst, lport, rport);
-            if(global_options.threshold && duration >= global_options.threshold ) {
-                fprintf(stderr, "Packet %s:%d <==> %s:%d cost %.3fms\n", 
+            if(global_options.is_client) {
+                client_outbound(tv, ip->ip_src, ip->ip_dst, lport, rport);
+            } else {
+                // server side outcoming
+                duration = outbound(tv, ip->ip_src, ip->ip_dst, lport, rport);
+            }
+            
+        }
+        if(global_options.threshold && duration >= global_options.threshold ) {
+            fprintf(stderr, "Packet %s:%d <==> %s:%d cost %.3fms\n", 
                 dst, dport,
                 src, sport,
                 duration/1000.0);
-            }
-            
         }
 
         break;

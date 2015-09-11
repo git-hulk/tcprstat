@@ -34,7 +34,11 @@ int inbound(struct timeval tv, struct in_addr laddr, struct in_addr raddr,
                 uint16_t lport, uint16_t rport);
 long long outbound(struct timeval tv, struct in_addr laddr, struct in_addr raddr,
                 uint16_t lport, uint16_t rport);
-                
+long long client_inbound(struct timeval tv, struct in_addr laddr, struct in_addr raddr,
+        uint16_t lport, uint16_t rport);
+int client_outbound(struct timeval tv, struct in_addr laddr, struct in_addr raddr,
+         uint16_t lport, uint16_t rport);
+
 struct stats_results *get_flush_stats(void);
 int free_results(struct stats_results *);
 
