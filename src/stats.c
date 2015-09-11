@@ -84,6 +84,7 @@ free_stats(void) {
     
     lock_sessions();
 
+	hash_clean(sessions, -1);
     hash_del(sessions);
     
     unlock_sessions();

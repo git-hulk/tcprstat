@@ -28,6 +28,7 @@
 #include <string.h>
 #include <time.h>
 #include <errno.h>
+#include <pcap.h>
 
 #include "tcprstat.h"
 #include "functions.h"
@@ -36,6 +37,7 @@
 #include "output.h"
 #include "stats.h"
 
+pcap_t *pcap;
 struct option long_options[] = {
     { "help", no_argument, NULL, 'h' },
     { "version", no_argument, NULL, 'V' },
@@ -105,7 +107,7 @@ main(int argc, char *argv[]) {
         case 'r':
             capture_file = fopen(optarg, "r");
             if (!capture_file) {
-                fprintf(stderr, "Cannot open file `%s': %s\n", optarg,
+                fprintf(stderr, "Cannot open file '%s': %s\n", optarg,
                         strerror(errno));
                 return EXIT_FAILURE;
                 
@@ -246,6 +248,9 @@ main(int argc, char *argv[]) {
         
     free_stats();
     free_addresses();
+	
+	pcap_close(pcap);
+	free(global_options.server);
     
     return EXIT_SUCCESS;
 

@@ -39,7 +39,7 @@ char *usage_msg =
     "\t                     addresses instead of pcap getting the list.\n"
     "\t                     This is useful when working with a pcap file got\n"
     "\t                     from another host with different addresses.\n"
-    "\t--destination <addresse>, -r\n"
+    "\t--destination <addresse>, -d\n"
     "\t                     <addresses> is a server ip\n"
     "\t--port <port>, -p    Capture traffic only for tcp/<port>.\n"
     "\t--format <format>, -f\n"
