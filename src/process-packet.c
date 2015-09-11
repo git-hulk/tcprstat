@@ -157,24 +157,24 @@ process_ip(pcap_t *dev, const struct ip *ip, struct timeval tv) {
             
         }
 
-		struct timeval tv;
-		time_t nowtime;
-		struct tm *nowtm;
-		char tmbuf[64], buf[64];
-
-		gettimeofday(&tv, NULL);
-		nowtime = tv.tv_sec;
-		nowtm = localtime(&nowtime);
-		strftime(tmbuf, sizeof tmbuf, "%Y-%m-%d %H:%M:%S", nowtm);
-		snprintf(buf, sizeof buf, "%s.%06d", tmbuf, (int)tv.tv_usec);
-
         if(global_options.threshold && duration >= global_options.threshold ) {
-            fprintf(stderr, "[%s] Packet %s:%d <==> %s:%d cost %.3fms\n", 
-				buf,
-                dst, dport,
-                src, sport,
-                duration/1000.0);
-        }
+				struct timeval tv;
+				time_t nowtime;
+				struct tm *nowtm;
+				char tmbuf[64], buf[64];
+
+				gettimeofday(&tv, NULL);
+				nowtime = tv.tv_sec;
+				nowtm = localtime(&nowtime);
+				strftime(tmbuf, sizeof tmbuf, "%Y-%m-%d %H:%M:%S", nowtm);
+				snprintf(buf, sizeof buf, "%s.%06d", tmbuf, (int)tv.tv_usec);
+
+				fprintf(stderr, "[%s] Packet %s:%d <==> %s:%d cost %.3fms\n", 
+								buf,
+								dst, dport,
+								src, sport,
+								duration/1000.0);
+		}
 
         break;
         
