@@ -249,9 +249,6 @@ main(int argc, char *argv[]) {
     free_stats();
     free_addresses();
 	
-	if(pcap) {
-		pcap_close(pcap);
-	}
 	free(global_options.server);
     
     return EXIT_SUCCESS;
