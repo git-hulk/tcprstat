@@ -275,7 +275,8 @@ hash_set_internal(struct session *sessions, unsigned long sz,
             int diff = (value.tv_sec - old.tv_sec) * 1000000 + (value.tv_usec - old.tv_usec)  ;
 			uint32_t id = ip->ip_id;
 			uint32_t len = ntohs(ip->ip_len);	
-			if(id != session->next->id) {
+			struct tcphdr *old_tcp = &session->next->tcp;
+			if(id != session->next->id && old_tcp->seq == tcp->seq) {
 				// as retrans, tcp header should be the same.
 				if(memcmp(&session->next->tcp, tcp, sizeof(struct tcphdr)) != 0) {
 					diff_tcp(&session->next->tcp, tcp);
