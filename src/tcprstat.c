@@ -39,6 +39,7 @@
 
 pcap_t *pcap;
 struct option long_options[] = {
+    { "client", no_argument, NULL, 'c' },
     { "help", no_argument, NULL, 'h' },
     { "version", no_argument, NULL, 'V' },
     
@@ -51,7 +52,6 @@ struct option long_options[] = {
     { "interval", required_argument, NULL, 't' },
     { "iterations", required_argument, NULL, 'n' },
     { "read", required_argument, NULL, 'r' },
-    { "client", required_argument, NULL, 'c' },
     { "threshold", required_argument, NULL, 'T' },
 
     { NULL, 0, NULL, '\0' }
