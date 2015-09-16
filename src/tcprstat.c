@@ -205,6 +205,17 @@ main(int argc, char *argv[]) {
     }
     while (c != -1);
     
+    if(global_options.is_client) {
+        if(!global_options.server) {
+            fprintf(stderr, "[ERROR] -d destination server is required.\n");
+            return 0;
+        }
+        if(!port) {
+            fprintf(stderr, "[ERROR] -p port is required.\n");
+            return 0;
+        }
+    }
+
     // Set up signals
     sa.sa_handler = terminate;
     sigemptyset(&sa.sa_mask);
@@ -238,8 +249,10 @@ main(int argc, char *argv[]) {
         // Fire up capturing thread
         pthread_create(&capture_thread_id, NULL, capture, NULL);
         
+		if(!global_options.threshold) {
         // Options thread
-        pthread_create(&output_thread_id, NULL, output_thread, &global_options);
+        	pthread_create(&output_thread_id, NULL, output_thread, &global_options);
+		}
         
         pthread_join(capture_thread_id, NULL);
         pthread_kill(output_thread_id, SIGINT);

@@ -169,7 +169,7 @@ process_ip(pcap_t *dev, const struct ip *ip, struct timeval tv) {
 				strftime(tmbuf, sizeof tmbuf, "%Y-%m-%d %H:%M:%S", nowtm);
 				snprintf(buf, sizeof buf, "%s.%06d", tmbuf, (int)tv.tv_usec);
 
-				fprintf(stderr, "[%s] Packet %s:%d <==> %s:%d cost %.3fms\n", 
+				fprintf(stderr, "[Slow] [ %s ] %s:%d <==> %s:%d cost %.3fms\n", 
 								buf,
 								dst, dport,
 								src, sport,

@@ -41,7 +41,7 @@ struct session {
 	uint32_t id;
 	uint32_t len;
     struct session *next;
-    
+	struct tcphdr tcp;
 };
 
 struct hash {
@@ -201,6 +201,54 @@ hash_clean(struct hash *hash, unsigned long min) {
     
 }
 
+static uint32_t EXTRACT_32BITS(const void *p) {
+    return ((uint32_t)ntohl(*(const uint32_t *)(p)));
+}
+void diff_tcp(struct tcphdr *tcp1, struct tcphdr *tcp2) {
+	if(tcp1->seq != tcp2->seq) {
+		printf("diff seq, tcp1: %u, tcp2: %u\n", EXTRACT_32BITS(&tcp1->seq), EXTRACT_32BITS(&tcp2->seq));
+	}
+	if(tcp1->ack_seq != tcp2->ack_seq) {
+		printf("diff seq_ack, tcp1: %u, tcp2: %u\n", EXTRACT_32BITS(&tcp1->ack_seq), EXTRACT_32BITS(&tcp2->ack_seq));
+	}
+	if(tcp1->window != tcp2->window) {
+		printf("diff window\n");
+	}
+	if(tcp1->check != tcp2->check) {
+		printf("diff check\n");
+	}
+	if(tcp1->urg_ptr != tcp2->urg_ptr) {
+		printf("diff urg_ptr\n");
+	}
+	if(tcp1->res1 != tcp2->res1) {
+		printf("diff res1\n");
+	}
+	if(tcp1->res2 != tcp2->res2) {
+		printf("diff res2\n");
+	}
+	if(tcp1->doff!= tcp2->doff) {
+		printf("diff doff\n");
+	}
+	if(tcp1->fin!= tcp2->fin) {
+		printf("diff fin\n");
+	}
+	if(tcp1->syn!= tcp2->syn) {
+		printf("diff syn");
+	}
+	if(tcp1->rst!= tcp2->rst) {
+		printf("diff rst");
+	}
+	if(tcp1->psh != tcp2->psh) {
+		printf("diff psh");
+	}
+	if(tcp1->ack != tcp2->ack) {
+		printf("diff ack");
+	}
+	if(tcp1->urg != tcp2->urg) {
+		printf("diff urg");
+	}
+}
+
 static int
 hash_set_internal(struct session *sessions, unsigned long sz,
          uint32_t laddr, uint32_t raddr, uint16_t lport, uint16_t rport,
@@ -211,6 +259,8 @@ hash_set_internal(struct session *sessions, unsigned long sz,
       
     port = hash_fun(laddr, raddr, lport, rport) % sz;
 
+	struct tcphdr *tcp;
+	tcp = (struct tcphdr*) ((char*)ip + sizeof(struct ip));
     for (session = sessions + port; session->next; session = session->next) {
         if (
             session->next->raddr == raddr &&
@@ -222,18 +272,19 @@ hash_set_internal(struct session *sessions, unsigned long sz,
             struct timeval old = session->next->tv;
             session->next->tv = value;
             
-            int diff = (value.tv_sec - old.tv_sec) * 1000 + (value.tv_usec - old.tv_usec) / 1000;
+            int diff = (value.tv_sec - old.tv_sec) * 1000000 + (value.tv_usec - old.tv_usec)  ;
 			uint32_t id = ip->ip_id;
 			uint32_t len = ntohs(ip->ip_len);	
-			if(session->next->len != len) {
-				fprintf(stderr, "Warning Diff length.\n");	
-			}
 			if(id != session->next->id) {
-            	fprintf(stderr, "Retrans %d:%d, after %d ms, length %d bytes.\n", lport, rport, diff, len);
+				// as retrans, tcp header should be the same.
+				if(memcmp(&session->next->tcp, tcp, sizeof(struct tcphdr)) != 0) {
+					diff_tcp(&session->next->tcp, tcp);
+					printf("[ERROR] Tcp header is difference when retrans.\n");
+				}
+            	fprintf(stderr, "[Retrans] %d:%d, after %d us, length %d bytes.\n", lport, rport, diff, len);
 		 		session->next->id = id;
-			}
+    		}
             return 0;
-            
         }
 	}
     
@@ -247,6 +298,7 @@ hash_set_internal(struct session *sessions, unsigned long sz,
     session->next->lport = lport;
 	session->next->id = ip->ip_id;
 	session->next->len = ntohs(ip->ip_len);
+	memcpy(&session->next->tcp, tcp, sizeof(struct tcphdr));
     
     session->next->tv = value;
     
