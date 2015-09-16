@@ -252,10 +252,10 @@ main(int argc, char *argv[]) {
 		if(!global_options.threshold) {
         // Options thread
         	pthread_create(&output_thread_id, NULL, output_thread, &global_options);
+        	pthread_kill(output_thread_id, SIGINT);
 		}
         
         pthread_join(capture_thread_id, NULL);
-        pthread_kill(output_thread_id, SIGINT);
         
     }
         
