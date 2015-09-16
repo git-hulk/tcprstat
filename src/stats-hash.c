@@ -19,10 +19,13 @@
  *
 **/ 
 
+#include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/time.h>
+#include <netinet/ip.h>
+#include <netinet/tcp.h>
 
 #include "config.h"
 
@@ -35,6 +38,8 @@ struct session {
     
     struct timeval tv;
     
+	uint32_t id;
+	uint32_t len;
     struct session *next;
     
 };
@@ -50,7 +55,7 @@ static unsigned long
     hash_fun(uint32_t laddr, uint32_t raddr, uint16_t lport, uint16_t rport);
 static int hash_set_internal(struct session *sessions, unsigned long sz,
         uint32_t laddr, uint32_t raddr, uint16_t lport, uint16_t rport,
-        struct timeval tv);
+        struct timeval tv, struct ip* ip);
 static int hash_load_check(struct hash *hash);
 static unsigned long hash_newsz(unsigned long sz);
     
@@ -149,12 +154,12 @@ hash_get_rem(struct hash *hash,
 int
 hash_set(struct hash *hash,
          uint32_t laddr, uint32_t raddr, uint16_t lport, uint16_t rport,
-         struct timeval value)
+         struct timeval value, struct ip *ip)
 {
     hash_load_check(hash);
     
     if (hash_set_internal(hash->sessions, hash->sz,
-                             laddr, raddr, lport, rport, value))
+                             laddr, raddr, lport, rport, value, ip))
     {
         hash->count ++;
         return 1;
@@ -199,14 +204,14 @@ hash_clean(struct hash *hash, unsigned long min) {
 static int
 hash_set_internal(struct session *sessions, unsigned long sz,
          uint32_t laddr, uint32_t raddr, uint16_t lport, uint16_t rport,
-         struct timeval value)
+         struct timeval value, struct ip *ip)
 {
     struct session *session;
     unsigned long port;
-    
+      
     port = hash_fun(laddr, raddr, lport, rport) % sz;
 
-    for (session = sessions + port; session->next; session = session->next)
+    for (session = sessions + port; session->next; session = session->next) {
         if (
             session->next->raddr == raddr &&
             session->next->laddr == laddr &&
@@ -214,11 +219,23 @@ hash_set_internal(struct session *sessions, unsigned long sz,
             session->next->lport == lport
         )
         {
+            struct timeval old = session->next->tv;
             session->next->tv = value;
             
+            int diff = (value.tv_sec - old.tv_sec) * 1000 + (value.tv_usec - old.tv_usec) / 1000;
+			uint32_t id = ip->ip_id;
+			uint32_t len = ntohs(ip->ip_len);	
+			if(session->next->len != len) {
+				fprintf(stderr, "Warning Diff length.\n");	
+			}
+			if(id != session->next->id) {
+            	fprintf(stderr, "Retrans %d:%d, after %d ms, length %d bytes.\n", lport, rport, diff, len);
+		 		session->next->id = id;
+			}
             return 0;
             
         }
+	}
     
     session->next = malloc(sizeof(struct session));
     if (!session->next)
@@ -228,6 +245,8 @@ hash_set_internal(struct session *sessions, unsigned long sz,
     session->next->laddr = laddr;
     session->next->rport = rport;
     session->next->lport = lport;
+	session->next->id = ip->ip_id;
+	session->next->len = ntohs(ip->ip_len);
     
     session->next->tv = value;
     
@@ -239,6 +258,8 @@ hash_set_internal(struct session *sessions, unsigned long sz,
 
 static int
 hash_load_check(struct hash *hash) {
+	hash_newsz(0);
+#if 0
     if ((hash->count * 100) / hash->sz > MAX_LOAD_PERCENT) {
         struct session *new_sessions, *old_sessions;
         unsigned long nsz, i;
@@ -262,7 +283,7 @@ hash_load_check(struct hash *hash) {
                 
                 hash_set_internal(new_sessions, nsz, session->laddr,
                         session->raddr, session->lport, session->rport,
-                        session->tv);
+                        session->tv, NULL);
                         
             }
             
@@ -277,6 +298,7 @@ hash_load_check(struct hash *hash) {
         return 1;
 
     }
+#endif
     
     return 0;
     

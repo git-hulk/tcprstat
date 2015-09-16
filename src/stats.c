@@ -101,11 +101,11 @@ free_stats(void) {
 
 int
 inbound(struct timeval tv, struct in_addr laddr, struct in_addr raddr,
-        uint16_t lport, uint16_t rport)
+        uint16_t lport, uint16_t rport, const struct ip *ip)
 {
     lock_sessions();
     
-    hash_set(sessions, laddr.s_addr, raddr.s_addr, lport, rport, tv);
+    hash_set(sessions, laddr.s_addr, raddr.s_addr, lport, rport, tv, ip);
     
     unlock_sessions();
     
@@ -115,7 +115,7 @@ inbound(struct timeval tv, struct in_addr laddr, struct in_addr raddr,
 
 long long
 outbound(struct timeval tv, struct in_addr laddr, struct in_addr raddr,
-         uint16_t lport, uint16_t rport)
+         uint16_t lport, uint16_t rport, const struct ip *ip)
 {
     struct timeval start;
     unsigned long newstat;
@@ -155,18 +155,18 @@ outbound(struct timeval tv, struct in_addr laddr, struct in_addr raddr,
 
 long long
 client_inbound(struct timeval tv, struct in_addr laddr, struct in_addr raddr,
-        uint16_t lport, uint16_t rport)
+        uint16_t lport, uint16_t rport, const struct ip *ip)
 {
     // client side is opposite to server side
-    return outbound(tv, laddr, raddr, lport, rport);
+    return outbound(tv, laddr, raddr, lport, rport, ip);
 }
 
 int
 client_outbound(struct timeval tv, struct in_addr laddr, struct in_addr raddr,
-         uint16_t lport, uint16_t rport)
+         uint16_t lport, uint16_t rport, const struct ip *ip)
 {
     // client side is opposite to server side
-    return inbound(tv, laddr, raddr, lport, rport);
+    return inbound(tv, laddr, raddr, lport, rport, ip);
 }
 
 static int

@@ -24,6 +24,7 @@
 
 #include <stdint.h>
 #include <netinet/in.h>
+#include <netinet/ip.h>
 
 struct stats_results;
 
@@ -31,13 +32,13 @@ int init_stats(void);
 int free_stats(void);
 
 int inbound(struct timeval tv, struct in_addr laddr, struct in_addr raddr,
-                uint16_t lport, uint16_t rport);
+                uint16_t lport, uint16_t rport, const struct ip *ip);
 long long outbound(struct timeval tv, struct in_addr laddr, struct in_addr raddr,
-                uint16_t lport, uint16_t rport);
+                uint16_t lport, uint16_t rport, const struct ip *ip);
 long long client_inbound(struct timeval tv, struct in_addr laddr, struct in_addr raddr,
-        uint16_t lport, uint16_t rport);
+        uint16_t lport, uint16_t rport, const struct ip *ip);
 int client_outbound(struct timeval tv, struct in_addr laddr, struct in_addr raddr,
-         uint16_t lport, uint16_t rport);
+         uint16_t lport, uint16_t rport, const struct ip *ip);
 
 struct stats_results *get_flush_stats(void);
 int free_results(struct stats_results *);

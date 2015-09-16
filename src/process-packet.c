@@ -138,10 +138,10 @@ process_ip(pcap_t *dev, const struct ip *ip, struct timeval tv) {
             rport = sport;
             
             if(global_options.is_client) {
-                duration = client_inbound(tv, ip->ip_dst, ip->ip_src, lport, rport);
+                duration = client_inbound(tv, ip->ip_dst, ip->ip_src, lport, rport, ip);
             } else {
                 // server side incoming
-                inbound(tv, ip->ip_dst, ip->ip_src, lport, rport);
+                inbound(tv, ip->ip_dst, ip->ip_src, lport, rport, ip);
             }
         }
         else {
@@ -149,10 +149,10 @@ process_ip(pcap_t *dev, const struct ip *ip, struct timeval tv) {
             rport = dport;
             
             if(global_options.is_client) {
-                client_outbound(tv, ip->ip_src, ip->ip_dst, lport, rport);
+                client_outbound(tv, ip->ip_src, ip->ip_dst, lport, rport, ip);
             } else {
                 // server side outcoming
-                duration = outbound(tv, ip->ip_src, ip->ip_dst, lport, rport);
+                duration = outbound(tv, ip->ip_src, ip->ip_dst, lport, rport, ip);
             }
             
         }
