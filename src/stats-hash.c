@@ -272,7 +272,7 @@ hash_set_internal(struct session *sessions, unsigned long sz,
             struct timeval old = session->next->tv;
             session->next->tv = value;
             
-            int diff = (value.tv_sec - old.tv_sec) * 1000000 + (value.tv_usec - old.tv_usec)  ;
+            int diff = (value.tv_sec - old.tv_sec) * 1000 + (value.tv_usec - old.tv_usec) /1000 ;
 			uint32_t id = ip->ip_id;
 			uint32_t len = ntohs(ip->ip_len);	
 			struct tcphdr *old_tcp = &session->next->tcp;
@@ -282,7 +282,7 @@ hash_set_internal(struct session *sessions, unsigned long sz,
 					diff_tcp(&session->next->tcp, tcp);
 					printf("[ERROR] Tcp header is difference when retrans.\n");
 				}
-            	fprintf(stderr, "[Retrans] %d:%d, after %d us, length %d bytes.\n", lport, rport, diff, len);
+            	fprintf(stderr, "[Retrans] %d:%d, after %d ms, length %d bytes.\n", lport, rport, diff, len);
 		 		session->next->id = id;
     		}
             return 0;

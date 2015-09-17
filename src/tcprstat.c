@@ -210,11 +210,14 @@ main(int argc, char *argv[]) {
             fprintf(stderr, "[ERROR] -d destination server is required.\n");
             return 0;
         }
-        if(!port) {
-            fprintf(stderr, "[ERROR] -p port is required.\n");
-            return 0;
-        }
     }
+	if(global_options.server) {
+		global_options.is_client = 1;
+	} 
+    if(!port) {
+    	fprintf(stderr, "[ERROR] -p port is required.\n");
+        return 0;
+   	}
 
     // Set up signals
     sa.sa_handler = terminate;
