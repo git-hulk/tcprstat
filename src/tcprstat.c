@@ -28,7 +28,6 @@
 #include <string.h>
 #include <time.h>
 #include <errno.h>
-#include <pcap.h>
 
 #include "tcprstat.h"
 #include "functions.h"
@@ -37,12 +36,12 @@
 #include "output.h"
 #include "stats.h"
 
-pcap_t *pcap;
 struct option long_options[] = {
     { "client", no_argument, NULL, 'c' },
     { "help", no_argument, NULL, 'h' },
     { "version", no_argument, NULL, 'V' },
     
+    { "interface", required_argument, NULL, 'i' },
     { "local", required_argument, NULL, 'l' },
     { "destination", required_argument, NULL, 'd' },
     { "port", required_argument, NULL, 'p' },
@@ -57,7 +56,7 @@ struct option long_options[] = {
     { NULL, 0, NULL, '\0' }
 
 };
-char *short_options = "hcVp:f:t:n:r:l:T:d:";
+char *short_options = "hcVp:f:t:n:r:l:T:d:i:";
 
 int specified_addresses = 0;
 
@@ -76,7 +75,8 @@ struct output_options global_options = {
     0,    
     DEFAULT_SHOW_HEADER,
     NULL,
-    NULL 
+    NULL, 
+    NULL
 };
 
 // Operation timestamp
@@ -107,7 +107,7 @@ main(int argc, char *argv[]) {
         case 'r':
             capture_file = fopen(optarg, "r");
             if (!capture_file) {
-                fprintf(stderr, "Cannot open file '%s': %s\n", optarg,
+                LOGGER(ERROR, "Cannot open file '%s': %s\n", optarg,
                         strerror(errno));
                 return EXIT_FAILURE;
                 
@@ -117,7 +117,7 @@ main(int argc, char *argv[]) {
         case 'l':
             specified_addresses = 1;
             if (parse_addresses(optarg)) {
-                fprintf(stderr, "Error parsing local addresses\n");
+                LOGGER(ERROR, "Error parsing local addresses\n");
                 return EXIT_FAILURE;
                 
             }
@@ -127,7 +127,7 @@ main(int argc, char *argv[]) {
         case 'p':
             port = strtol(optarg, NULL, 0);
             if (port <= 0 || port > 65535) {
-                fprintf(stderr, "Invalid port\n");
+                LOGGER(ERROR, "Invalid port\n");
                 return EXIT_FAILURE;
             }
             
@@ -135,7 +135,7 @@ main(int argc, char *argv[]) {
             
         case 'f':
             if (!check_format(optarg)) {
-                fprintf(stderr, "Bad format provided: `%s'\n", optarg);
+                LOGGER(ERROR, "Bad format provided: `%s'\n", optarg);
                 return EXIT_FAILURE;
             }
             
@@ -146,7 +146,7 @@ main(int argc, char *argv[]) {
         case 't':
             global_options.interval = strtoul(optarg, NULL, 10);
             if (interval <= 0 || interval >= MAX_OUTPUT_INTERVAL) {
-                fprintf(stderr, "Bad interval provided\n");
+                LOGGER(ERROR, "Bad interval provided\n");
                 return EXIT_FAILURE;
             }
             
@@ -155,7 +155,7 @@ main(int argc, char *argv[]) {
         case 'n':
             global_options.iterations = strtol(optarg, NULL, 10);
             if (interval < 0) {
-                fprintf(stderr, "Bad iterations provided\n");
+                LOGGER(ERROR, "Bad iterations provided\n");
                 return EXIT_FAILURE;
             }
             
@@ -164,7 +164,7 @@ main(int argc, char *argv[]) {
         case 'T':
             global_options.threshold = strtol(optarg, NULL, 10) * 1000;
             if (global_options.threshold < 0) {
-                fprintf(stderr, "Bad threshold provided\n");
+                LOGGER(ERROR, "Bad threshold provided\n");
                 return EXIT_FAILURE;
             }
             
@@ -174,6 +174,11 @@ main(int argc, char *argv[]) {
             global_options.server = strdup(optarg);
             
             break;
+        case 'i':
+	        global_options.interface = strdup(optarg);
+
+            break;
+
 
         case 'c':
             global_options.is_client = 1;
@@ -205,9 +210,13 @@ main(int argc, char *argv[]) {
     }
     while (c != -1);
     
+	if(! global_options.interface) {
+        global_options.interface = "any";
+	}
+
     if(global_options.is_client) {
         if(!global_options.server) {
-            fprintf(stderr, "[ERROR] -d destination server is required.\n");
+            LOGGER(ERROR, "%s -d destination server is required.\n", argv[0]);
             return 0;
         }
     }
@@ -215,7 +224,7 @@ main(int argc, char *argv[]) {
 		global_options.is_client = 1;
 	} 
     if(!port) {
-    	fprintf(stderr, "[ERROR] -p port is required.\n");
+    	LOGGER(ERROR, "%s -p port is required.\n", argv[0]);
         return 0;
    	}
 

@@ -26,6 +26,7 @@
 #include <string.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include "functions.h"
 
 struct address_list {
     struct in_addr in_addr;
@@ -41,7 +42,7 @@ get_addresses(void) {
     struct address_list *address_list_curr;
 
     if (pcap_findalldevs(&devlist, errbuf)) {
-        fprintf(stderr, "pcap: %s\n", errbuf);
+        LOGGER(ERROR, "pcap: %s\n", errbuf);
         return 1;
     }
     

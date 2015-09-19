@@ -20,6 +20,7 @@
 **/
 
 #include <stdio.h>
+#include <stdarg.h>
 #include <pcap.h>
 
 #include "config.h"
@@ -32,6 +33,7 @@ char *usage_msg =
     "             [--read=<file>]\n"
     "       %s --version | --help\n"
     "\n"
+    "\t--interface <interface>, -i interface, which interface to capture.\n"
     "\t--read <file>, -r    Capture from pcap file <file>, not live.\n"
     "\t--local <addresses>, -l\n"
     "\t                     <addresses> is a comma-separated list of ip\n"
@@ -105,4 +107,28 @@ dump_version(FILE *stream) {
 
     return 0;
 
+}
+
+void _log_raw_string(const char *file, int line, LOGGER_LEVEL level, const char *fmt, ...) {
+    int off;
+    va_list ap;
+    char buf[64];
+    char msg[1024];
+    struct timeval tv;
+    const char * LOGGER_MSG[] = { 
+        "DEBUG", "INFO", "NOTICE", "WARNING", "ERROR"
+    };
+
+    gettimeofday(&tv,NULL);
+    off = strftime(buf,sizeof(buf),"%Y-%m-%d %H:%M:%S.",localtime(&tv.tv_sec)); 
+    snprintf(buf+off,sizeof(buf)-off,"%03d",(int)tv.tv_usec/1000);
+
+    va_start(ap, fmt);
+    vsnprintf(msg, sizeof(msg), fmt, ap); 
+    va_end(ap);
+    fprintf(stderr, "[%s] [ %s ] %s:%d %s\n", 
+        LOGGER_MSG[level], buf, 
+        file, line,
+        msg
+    );
 }

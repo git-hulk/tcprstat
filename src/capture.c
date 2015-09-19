@@ -22,6 +22,7 @@
 #include "tcprstat.h"
 #include "capture.h"
 #include "output.h"
+#include "functions.h"
 #include "process-packet.h"
 
 #include <pcap.h>
@@ -37,9 +38,9 @@ capture(void *arg) {
     int r;
 
     // Second argument 0 stands for non-promiscuous mode
-    pcap = pcap_open_live("any", CAPTURE_LENGTH, 0, READ_TIMEOUT, errbuf);
+    pcap = pcap_open_live(global_options.interface, CAPTURE_LENGTH, 0, READ_TIMEOUT, errbuf);
     if (!pcap) {
-        fprintf(stderr, "pcap: %s\n", errbuf);
+        LOGGER(ERROR, "pcap: %s\n", errbuf);
         return NULL;
         
     }
@@ -56,13 +57,13 @@ capture(void *arg) {
     }
 
     if (pcap_compile(pcap, &bpf, filter, 1, 0)) {
-        fprintf(stderr, "pcap: %s\n", pcap_geterr(pcap));
+        LOGGER(ERROR, "pcap: %s\n", pcap_geterr(pcap));
         return NULL;
         
     }
     
     if (pcap_setfilter(pcap, &bpf)) {
-        fprintf(stderr, "pcap: %s\n", pcap_geterr(pcap));
+        LOGGER(ERROR, "pcap: %s\n", pcap_geterr(pcap));
         return NULL;
         
     }
@@ -70,7 +71,7 @@ capture(void *arg) {
     // The -1 here stands for "infinity"
     r = pcap_loop(pcap, -1, process_packet, (unsigned char *) pcap);
     if (r == -1) {
-        fprintf(stderr, "pcap: %s\n", pcap_geterr(pcap));
+        LOGGER(ERROR, "pcap: %s\n", pcap_geterr(pcap));
         return NULL;
         
     }
@@ -88,7 +89,7 @@ offline_capture(FILE *fcapture) {
 
     pcap = pcap_fopen_offline(fcapture, errbuf);
     if (!pcap) {
-        fprintf(stderr, "pcap: %s\n", errbuf);
+        LOGGER(ERROR, "pcap: %s\n", errbuf);
         return 1;
         
     }
@@ -105,13 +106,13 @@ offline_capture(FILE *fcapture) {
     }
 
     if (pcap_compile(pcap, &bpf, filter, 1, 0)) {
-        fprintf(stderr, "pcap: %s\n", pcap_geterr(pcap));
+        LOGGER(ERROR, "pcap: %s\n", pcap_geterr(pcap));
         return 1;
         
     }
     
     if (pcap_setfilter(pcap, &bpf)) {
-        fprintf(stderr, "pcap: %s\n", pcap_geterr(pcap));
+        LOGGER(ERROR, "pcap: %s\n", pcap_geterr(pcap));
         return 1;
         
     }
@@ -119,7 +120,7 @@ offline_capture(FILE *fcapture) {
     // The -1 here stands for "infinity"
     r = pcap_loop(pcap, -1, process_packet, (unsigned char *) pcap);
     if (r == -1) {
-        fprintf(stderr, "pcap: %s\n", pcap_geterr(pcap));
+        LOGGER(ERROR, "pcap: %s\n", pcap_geterr(pcap));
         return 1;
         
     }

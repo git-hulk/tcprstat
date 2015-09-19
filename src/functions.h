@@ -24,8 +24,18 @@
 
 #include <stdio.h>
 
+#define LOGGER(level, ...) do { \
+    _log_raw_string(__FILE__, __LINE__, level, __VA_ARGS__); \
+} while(0)
+
+typedef enum {
+    DEBUG, INFO, NOTICE, WARNING, ERROR
+}LOGGER_LEVEL;
+
+
 int dump_usage(FILE *stream);
 int dump_help(FILE *stream);
 int dump_version(FILE *stream);
+void _log_raw_string(const char *file, int line, LOGGER_LEVEL level, const char *fmt, ...);
 
 #endif

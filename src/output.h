@@ -34,6 +34,7 @@ struct output_options {
     int show_header;
     char *header;
     char *server;
+    char *interface;
 };
 
 // Parameter of output_thread is of type output_thread_options
