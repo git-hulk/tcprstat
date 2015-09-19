@@ -24,6 +24,12 @@
 
 #include <stdio.h>
 
+#define C_NONE "\033[0m"
+#define C_RED "\033[31m"
+#define C_GREEN "\033[32m"
+#define C_PURPLE "\033[35m"
+#define C_YELLOW "\033[33m"
+
 #define LOGGER(level, ...) do { \
     _log_raw_string(__FILE__, __LINE__, level, __VA_ARGS__); \
 } while(0)

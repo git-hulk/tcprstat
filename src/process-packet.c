@@ -36,6 +36,7 @@
 #include "stats.h"
 #include "tcprstat.h"
 #include "output.h"
+#include "functions.h"
 
 void
 process_packet(unsigned char *user, const struct pcap_pkthdr *header,
@@ -169,7 +170,7 @@ process_ip(pcap_t *dev, const struct ip *ip, struct timeval tv) {
 				strftime(tmbuf, sizeof tmbuf, "%Y-%m-%d %H:%M:%S", nowtm);
 				snprintf(buf, sizeof buf, "%s.%06d", tmbuf, (int)tv.tv_usec);
 
-				fprintf(stderr, "[Slow] [ %s ] %s:%d <==> %s:%d cost %.3fms\n", 
+				fprintf(stderr, C_GREEN"[SlowQuery] [ %s ] %s:%d <==> %s:%d cost %.3fms\n"C_NONE, 
 								buf,
 								dst, dport,
 								src, sport,

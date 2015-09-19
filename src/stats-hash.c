@@ -32,6 +32,7 @@
 #include <arpa/inet.h>
 
 #include "config.h"
+#include "functions.h"
 
 #define INITIAL_HASH_SZ     2053
 #define MAX_LOAD_PERCENT    65
@@ -273,7 +274,7 @@ dump_retrans_session(struct session *session, uint32_t bytes, uint32_t delay)
 	strftime(tmbuf, sizeof tmbuf, "%Y-%m-%d %H:%M:%S", nowtm);
 	snprintf(buf, sizeof buf, "%s.%06d", tmbuf, (int)tv.tv_usec);
 
-	fprintf(stderr, "[Retrans] [%s] %s:%d <==> %s:%d, after %d ms, length %d bytes.\n", 
+	fprintf(stderr, C_YELLOW"[Retrans] [%s] %s:%d <==> %s:%d, after %d ms, length %d bytes.\n"C_NONE, 
 		buf,
 		laddr, session->lport,
 		raddr, session->rport, 
