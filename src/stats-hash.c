@@ -251,10 +251,6 @@ hash_set_session(struct session *sessions, unsigned long sz,
 static void
 dump_retrans_session(struct session *session, uint32_t bytes, uint32_t delay)
 {
-	struct timeval tv;
-	time_t nowtime;
-	struct tm *nowtm;
-	char tmbuf[64], buf[64];
 	char laddr[16], raddr[16], *addr;
 	struct in_addr s;
 
@@ -268,13 +264,15 @@ dump_retrans_session(struct session *session, uint32_t bytes, uint32_t delay)
     strncpy(raddr, addr, 15);
     raddr[15] = '\0';
 
-	gettimeofday(&tv, NULL);
-	nowtime = tv.tv_sec;
-	nowtm = localtime(&nowtime);
-	strftime(tmbuf, sizeof tmbuf, "%Y-%m-%d %H:%M:%S", nowtm);
-	snprintf(buf, sizeof buf, "%s.%06d", tmbuf, (int)tv.tv_usec);
 
-	fprintf(stderr, C_YELLOW"[Retrans] [%s] %s:%d <==> %s:%d, after %d ms, length %d bytes.\n"C_NONE, 
+    int off;
+    char buf[64];
+    struct timeval tv;
+
+    gettimeofday(&tv,NULL);
+    off = strftime(buf,sizeof(buf),"%Y-%m-%d %H:%M:%S.",localtime(&tv.tv_sec)); 
+    snprintf(buf+off,sizeof(buf)-off,"%03d",(int)tv.tv_usec/1000);
+	fprintf(stderr, C_YELLOW"[Retransmit] [%s] %s:%d <==> %s:%d, after %d ms, length %d bytes.\n"C_NONE, 
 		buf,
 		laddr, session->lport,
 		raddr, session->rport, 
@@ -306,7 +304,7 @@ hash_set_internal(struct session *sessions, unsigned long sz,
             session->next->tv = value;
             
 			uint32_t id = ip->ip_id;
-			if(id != session->next->id && session->next->seq == tcp->seq) {
+			if(session->next->seq == tcp->seq) {
             	int delay;
 				delay = (value.tv_sec - old.tv_sec) * 1000 + (value.tv_usec - old.tv_usec) / 1000;
 				dump_retrans_session(session->next, ntohs(ip->ip_len), delay);
