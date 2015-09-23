@@ -304,7 +304,7 @@ hash_set_internal(struct session *sessions, unsigned long sz,
             session->next->tv = value;
             
 			uint32_t id = ip->ip_id;
-			if(session->next->seq == tcp->seq) {
+			if(id != session->next->id && session->next->seq == tcp->seq) {
             	int delay;
 				delay = (value.tv_sec - old.tv_sec) * 1000 + (value.tv_usec - old.tv_usec) / 1000;
 				dump_retrans_session(session->next, ntohs(ip->ip_len), delay);
