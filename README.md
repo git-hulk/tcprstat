@@ -22,6 +22,8 @@ a server with no need for compilation tools.
 
 tcprstat is released under the GPL, version 2 or 3.
 
+
+```shell
 ################################################################################
 #                                                                              #
 #   tcprstat -- Extract stats about TCP response times                         #
@@ -43,6 +45,8 @@ tcprstat is released under the GPL, version 2 or 3.
 #   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA               #
 #                                                                              #
 ################################################################################
+
+```
 
 ### 1) install
 #### 1.1 Linux
