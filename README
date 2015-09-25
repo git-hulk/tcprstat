@@ -47,7 +47,7 @@ tcprstat is released under the GPL, version 2 or 3.
 ### 1) install
 #### 1.1 Linux
 
-```
+```shell
 $ chmod +x bootstrap
 $ ./bootstrap
 $ ./configure
@@ -58,7 +58,7 @@ $ sudo make && make install
 
 #### 2.1 retransmit and slow query
 
-```
+```shell
 -T threshod (ms), when query is slower than threshod will be printed.
 
 -d remote address, it's needed when tcprstat is used in client side.
@@ -70,7 +70,7 @@ $ sudo make && make install
 
 #### 2.2 query summary
 
-```
+```shell
 --interval <seconds>, -t Output interval. Default is 10.
 --read <file>, -r        Capture from pcap file <file>, not live.
 --iterations <n>,     -n Output iterations. Default is 1, 0 is infinity
@@ -85,7 +85,7 @@ When tcprstat is used in client side, it's used to monitor retransmits and slow 
 
 Client slow query and retransmit example.
 
-```
+```shell
 sudo tcprstat -d 192.168.3.1 -p 13314 -T 50  -l 192.168.3.4
 ``` 
 
@@ -107,13 +107,13 @@ When tcprstat is used in server side, it's used to catch slow query by record wh
 
 Server slow query and retransmit example.
 
-```
+```shell
 sudo tcprstat -p 13314 -T 50  -l 192.168.3.1
 ```
 
 Server query summary example.
 
-```
+```shell
 sudo tcprstat -p 13314 -t 10 -n 10 -l 192.168.3.1
 ```
 
