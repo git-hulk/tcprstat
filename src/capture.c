@@ -22,10 +22,12 @@
 #include "tcprstat.h"
 #include "capture.h"
 #include "output.h"
+#include "util.h"
 #include "functions.h"
 #include "process-packet.h"
 
 #include <pcap.h>
+#include <string.h>
 
 pcap_t *pcap;
 struct output_options global_options;
@@ -34,8 +36,10 @@ void *
 capture(void *arg) {
     struct bpf_program bpf;
     char errbuf[PCAP_ERRBUF_SIZE];
-    char filter[30];
-    int r;
+    char filter[300];
+    char ports_str[256];
+    char **ports;
+    int r, n_ports;
 
     // Second argument 0 stands for non-promiscuous mode
     pcap = pcap_open_live(global_options.interface, CAPTURE_LENGTH, 0, READ_TIMEOUT, errbuf);
@@ -45,13 +49,29 @@ capture(void *arg) {
         
     }
     
+    if(port) {
+        int i, n = 0 ;
+        ports = split_string(port, strlen(port), ",", 1, &n_ports);
+        if(n_ports > 10) {
+            LOGGER(ERROR, "it's unscientific to listen so many ports.\n", errbuf);
+            return NULL;
+        }
+       
+        n = snprintf(ports_str, 256, "tcp port %s", ports[0]);
+        
+        for(i = 1; i < n_ports; i++) {
+            n += snprintf(ports_str + n, 256, " or tcp port %s", ports[i]);
+        }
+        split_string_free(ports, n_ports);
+    }
+
     // Capture only TCP
-    if (global_options.server && port) {
-        sprintf(filter, "host %s and tcp port %d", global_options.server, port);
-    } else if (global_options.server && !port) {
+    if (global_options.server && n_ports) {
+        sprintf(filter, "host %s and (%s)", global_options.server, ports_str);
+    } else if (global_options.server && !n_ports) {
         sprintf(filter, "host %s", global_options.server);
-    } else if (!global_options.server && port) {
-        sprintf(filter, "tcp port %d", port);
+    } else if (!global_options.server && n_ports) {
+        sprintf(filter, " (%s)", ports_str);
     } else {
         sprintf(filter, "tcp");
     }
@@ -84,8 +104,10 @@ int
 offline_capture(FILE *fcapture) {
     struct bpf_program bpf;
     char errbuf[PCAP_ERRBUF_SIZE];
-    char filter[256];
-    int r;
+    char filter[300];
+    char ports_str[256];
+    char **ports;
+    int r, n_ports;
 
     pcap = pcap_fopen_offline(fcapture, errbuf);
     if (!pcap) {
@@ -94,13 +116,29 @@ offline_capture(FILE *fcapture) {
         
     }
     
+    if(port) {
+        int i, n = 0 ;
+        ports = split_string(port, strlen(port), ",", 1, &n_ports);
+        if(n_ports > 10) {
+            LOGGER(ERROR, "it's unscientific to listen so many ports.\n", errbuf);
+            return 1;
+        }
+       
+        n = snprintf(ports_str, 256, "tcp port %s", ports[0]);
+        
+        for(i = 1; i < n_ports; i++) {
+            n += snprintf(ports_str + n, 256, " or tcp port %s", ports[i]);
+        }
+        split_string_free(ports, n_ports);
+    }
+
     // Capture only TCP
-    if (global_options.server && port) {
-        sprintf(filter, "host %s and tcp port %d", global_options.server, port);
-    } else if (global_options.server && !port) {
+    if (global_options.server && n_ports) {
+        sprintf(filter, "host %s and (%s)", global_options.server, ports_str);
+    } else if (global_options.server && !n_ports) {
         sprintf(filter, "host %s", global_options.server);
-    } else if (!global_options.server && port) {
-        sprintf(filter, "tcp port %d", port);
+    } else if (!global_options.server && n_ports) {
+        sprintf(filter, "(%s)", ports_str);
     } else {
         sprintf(filter, "tcp");
     }

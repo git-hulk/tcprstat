@@ -90,16 +90,16 @@ When tcprstat is used in client side, it's used to monitor retransmits and slow 
 Client slow query and retransmit example.
 
 ```shell
-sudo tcprstat -d 192.168.3.1 -p 13314 -T 50  -l 192.168.3.4
+sudo tcprstat -d 192.168.3.1 -p 13314,13315 -T 50  -l 192.168.3.4
 ``` 
 
-`-T 50` is mean to print message when cleint send request and receive response cost more than 50 ms. 
+`-T 50` 50 is mean to print message when cleint send request and receive response cost more than 50 ms. 
 
-`-l 192.168.3.4` is local address, as libpcap may failed while ethernet is bond.
+`-l 192.168.3.4` 192.168.3.4 is local address, as libpcap may failed while ethernet is bond.
 
-`-d 192.168.3.1` is destination address to monitor, like mc, redis...
+`-d 192.168.3.1`  192.168.3.1 is destination address to monitor, like mc, redis...
 
-`-p 13314` is destination port to monitor
+`-p 13314,13315` 13314,13315 is destination port to monitor, multi port seperate by comma
 
 result looks like below, one slow query and two retranmits.
 
@@ -112,7 +112,7 @@ When tcprstat is used in server side, it's used to catch slow query by record wh
 Server slow query and retransmit example.
 
 ```shell
-sudo tcprstat -p 13314 -T 50  -l 192.168.3.1
+sudo tcprstat -p 13314,13315 -T 50  -l 192.168.3.1
 ```
 
 Server query summary example.

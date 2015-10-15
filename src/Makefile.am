@@ -24,7 +24,7 @@ bin_PROGRAMS = tcprstat tcprstat-static
 tcprstat_SOURCES = tcprstat.h tcprstat.c functions.h functions.c capture.h \
 	capture.c process-packet.h process-packet.c local-addresses.h \
 	local-addresses.c stats.h stats.c output.h output.c stats-hash.h \
-	stats-hash.c
+	stats-hash.c util.c util.h
 tcprstat_static_SOURCES = $(tcprstat_SOURCES)
 
 if BUILD_PCAP

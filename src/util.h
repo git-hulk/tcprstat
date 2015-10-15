@@ -1,3 +1,4 @@
+
 /**
  *   tcprstat -- Extract stats about TCP response times
  *   Copyright (C) 2010  Ignacio Nin
@@ -19,28 +20,8 @@
  *
 **/
 
-#if !defined(TCPRSTAT_H)
-#define TCPRSTAT_H
-
-#include <time.h>
-#include <stdio.h>
-
-#define DEFAULT_OUTPUT_FORMAT \
-    "%T\\t%n\\t%M\\t%m\\t%a\\t%h\\t%S\\t" \
-    "%95M\\t%95a\\t%95S\\t%99M\\t%99a\\t%99S\\n"
-#define DEFAULT_OUTPUT_INTERVAL 10
-#define MAX_OUTPUT_INTERVAL 60 * 60 * 24
-#define DEFAULT_OUTPUT_ITERATIONS 1
-
-#define DEFAULT_SHOW_HEADER 1
-
-extern char *port;
-extern char *program_name;
-extern time_t timestamp;
-
-extern FILE *capture_file;
-extern struct output_options global_options;
-
-void terminate(int signal);
-
+#if !defined(STATS_H)
+#define STATS_H
+char **split_string(char *str, int len, char *sep, int sep_len, int *count);
+void split_string_free(char **tokens, int count);
 #endif
