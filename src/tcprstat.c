@@ -64,7 +64,7 @@ pthread_t capture_thread_id, output_thread_id;
 
 // Global options
 char *program_name;
-int port;
+char *port;
 int interval = 30;
 FILE *capture_file = NULL;
 struct output_options global_options = {
@@ -125,12 +125,7 @@ main(int argc, char *argv[]) {
             break;
             
         case 'p':
-            port = strtol(optarg, NULL, 0);
-            if (port <= 0 || port > 65535) {
-                LOGGER(ERROR, "Invalid port\n");
-                return EXIT_FAILURE;
-            }
-            
+            port = strdup(optarg);
             break;
             
         case 'f':

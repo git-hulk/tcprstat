@@ -43,7 +43,7 @@ char *usage_msg =
     "\t                     from another host with different addresses.\n"
     "\t--destination <addresse>, -d\n"
     "\t                     <addresses> is a server ip\n"
-    "\t--port <port>, -p    Capture traffic only for tcp/<port>.\n"
+    "\t--port <port1,port2...>, -p like 11211,11212.. multi port seperate by comma.\n"
     "\t--format <format>, -f\n"
     "\t                     Output format. Argument is a string detailing\n"
     "\t                     how the information is presented. Accepted codes:\n"
