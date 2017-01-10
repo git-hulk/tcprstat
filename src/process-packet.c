@@ -162,7 +162,6 @@ process_ip(pcap_t *dev, const struct ip *ip, struct timeval tv) {
             int off;
             char buf[64];
                 
-            gettimeofday(&tv,NULL);
             off = strftime(buf,sizeof(buf),"%Y-%m-%d %H:%M:%S.",localtime(&tv.tv_sec)); 
             snprintf(buf+off,sizeof(buf)-off,"%03d",(int)tv.tv_usec/1000);
 			fprintf(stderr, C_GREEN"[SlowQuery] [%s] %s:%d <==> %s:%d cost %.3fms\n"C_NONE, 
